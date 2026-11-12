@@ -5,7 +5,7 @@ A beginner-friendly 2D falling-block puzzle game built with Unity 6. The game us
 
 ## Play online（一次成功）
 
-Play the game at [Block Drop on GitHub Pages](https://xinyoulin9-ship-it.github.io/11425039test_game001/).
+Play the game at [Block Drop on GitHub Pages](https://xinyoulin9-ship-it.github.io/11425039test_game002/).
 
 ## Controls
 
