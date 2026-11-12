@@ -1,3 +1,4 @@
+
 # Block Drop
 
 A beginner-friendly 2D falling-block puzzle game built with Unity 6. The game uses Unity's built-in IMGUI, so it has no external art or package dependencies.
@@ -26,4 +27,4 @@ Add this repository folder as an existing project in Unity Hub and open it with 
 
 ## Build for GitHub Pages
 
-Open the project in Unity and select **Build → Build WebGL for GitHub Pages**. The web build is written to `docs/` and uses disabled compression so it can be served as static files by GitHub Pages.
+Open the project in Unity and select **Build → Build WebGL for GitHub Pages**. The web build is written to `docs/` and uses Brotli compression with Unity decompression fallback so it can run on static hosts such as GitHub Pages.
