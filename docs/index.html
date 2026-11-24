@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="zh-Hant">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | My project (2)</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+    <style>
+      #cjk-overlay { position: absolute; z-index: 4; pointer-events: none; display: none; }
+      .cjk-label { position: absolute; box-sizing: border-box; color: #d5e0f4; font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif; text-shadow: 0 1px 2px #19263b; white-space: nowrap; }
+      .cjk-instructions { white-space: pre-line; line-height: 1.58; padding: 1px 3px; background: rgba(57, 82, 127, .97); }
+      .cjk-button { text-align: center; color: #f1f4fa; font-weight: 700; text-shadow: 0 1px 2px #222; }
+    </style>
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <div id="cjk-overlay" aria-hidden="true"></div>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -25,6 +32,75 @@
     </div>
     <script>
       var canvas = document.querySelector("#unity-canvas");
+      var cjkOverlay = document.querySelector("#cjk-overlay");
+      var cjkStarted = false;
+      var cjkPaused = false;
+
+      function addCjkLabel(text, x, y, w, h, className, fontSize, align) {
+        var item = document.createElement("div");
+        item.className = "cjk-label " + (className || "");
+        item.textContent = text;
+        item.style.left = (x / 960 * 100) + "%";
+        item.style.top = (y / 600 * 100) + "%";
+        item.style.width = (w / 960 * 100) + "%";
+        item.style.height = (h / 600 * 100) + "%";
+        item.style.fontSize = fontSize + "px";
+        item.style.textAlign = align || "left";
+        item.style.display = "none";
+        cjkOverlay.appendChild(item);
+        return item;
+      }
+
+      var startTitle = addCjkLabel("準備好了嗎？", 250, 267, 267, 23, "", 18, "center");
+      var startHint = addCjkLabel("按 Enter 開始遊戲", 250, 289, 267, 20, "", 14, "center");
+      var pauseTitle = addCjkLabel("暫停中", 250, 267, 267, 23, "", 18, "center");
+      var pauseHint = addCjkLabel("按 R 重新開始", 250, 289, 267, 20, "", 14, "center");
+      var scoreLabel = addCjkLabel("分數", 544, 50, 165, 28, "", 14);
+      var linesLabel = addCjkLabel("消除列數", 544, 128, 165, 28, "", 14);
+      var nextLabel = addCjkLabel("下一個", 544, 172, 165, 25, "", 14);
+      var controlsLabel = addCjkLabel("操作方式", 544, 299, 165, 22, "", 14);
+      var controlsText = addCjkLabel("← → / A D　移動\n↑ / W　旋轉\n↓ / S　加速下降\n空白鍵　直接落下\nP　暫停", 544, 328, 165, 95, "cjk-instructions", 12);
+      var pauseButtonLabel = addCjkLabel("暫停", 544, 240, 165, 20, "cjk-button", 13);
+      var restartButtonLabel = addCjkLabel("重新開始", 544, 264, 165, 20, "cjk-button", 13);
+
+      function updateCjkLabels() {
+        var showStart = !cjkStarted;
+        startTitle.style.display = showStart ? "block" : "none";
+        startHint.style.display = showStart ? "block" : "none";
+        pauseTitle.style.display = cjkStarted && cjkPaused ? "block" : "none";
+        pauseHint.style.display = cjkStarted && cjkPaused ? "block" : "none";
+        [scoreLabel, linesLabel, nextLabel, controlsLabel, controlsText,
+          pauseButtonLabel, restartButtonLabel].forEach(function (item) { item.style.display = "block"; });
+        pauseButtonLabel.textContent = cjkPaused ? "繼續" : "暫停";
+      }
+
+      function syncCjkOverlay() {
+        var container = document.querySelector("#unity-container");
+        var canvasRect = canvas.getBoundingClientRect();
+        var containerRect = container.getBoundingClientRect();
+        cjkOverlay.style.left = (canvasRect.left - containerRect.left) + "px";
+        cjkOverlay.style.top = (canvasRect.top - containerRect.top) + "px";
+        cjkOverlay.style.width = canvasRect.width + "px";
+        cjkOverlay.style.height = canvasRect.height + "px";
+        cjkOverlay.style.display = "block";
+      }
+
+      window.addEventListener("resize", syncCjkOverlay);
+      window.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") { cjkStarted = true; cjkPaused = false; }
+        else if (event.key.toLowerCase() === "p" && cjkStarted) cjkPaused = !cjkPaused;
+        else if (event.key.toLowerCase() === "r") { cjkStarted = true; cjkPaused = false; }
+        updateCjkLabels();
+      }, true);
+      canvas.addEventListener("click", function (event) {
+        var rect = canvas.getBoundingClientRect();
+        var x = (event.clientX - rect.left) / rect.width * 960;
+        var y = (event.clientY - rect.top) / rect.height * 600;
+        if (x >= 544 && x <= 709 && y >= 240 && y <= 260 && cjkStarted) cjkPaused = !cjkPaused;
+        if (x >= 544 && x <= 709 && y >= 264 && y <= 284) { cjkStarted = true; cjkPaused = false; }
+        updateCjkLabels();
+      });
+      updateCjkLabels();
 
       // Shows a temporary message banner/ribbon for a few seconds, or
       // a permanent error message on top of the canvas if type=='error'.
@@ -117,8 +193,10 @@
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
               }).then((unityInstance) => {
                 document.querySelector("#unity-loading-bar").style.display = "none";
+                syncCjkOverlay();
                 document.querySelector("#unity-fullscreen-button").onclick = () => {
                   unityInstance.SetFullscreen(1);
+                  setTimeout(syncCjkOverlay, 250);
                 };
 
               }).catch((message) => {
