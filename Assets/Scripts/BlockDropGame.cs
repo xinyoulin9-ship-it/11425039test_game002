@@ -38,6 +38,7 @@ public sealed class BlockDropGame : MonoBehaviour
     private GUIStyle labelStyle;
     private GUIStyle smallStyle;
     private GUIStyle buttonStyle;
+    private Font chineseFont;
 
     private static readonly Vector2Int[][] BaseCells =
     {
@@ -225,10 +226,11 @@ public sealed class BlockDropGame : MonoBehaviour
     {
         if (titleStyle == null)
         {
-            titleStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { textColor = Color.white } };
-            labelStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, normal = { textColor = new Color(0.80f, 0.87f, 0.98f) } };
-            smallStyle = new GUIStyle(GUI.skin.label) { normal = { textColor = new Color(0.74f, 0.80f, 0.92f) } };
-            buttonStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold };
+            chineseFont = Resources.Load<Font>("Fonts/NotoSansTC");
+            titleStyle = new GUIStyle(GUI.skin.label) { font = chineseFont, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { textColor = Color.white } };
+            labelStyle = new GUIStyle(GUI.skin.label) { font = chineseFont, fontStyle = FontStyle.Bold, normal = { textColor = new Color(0.80f, 0.87f, 0.98f) } };
+            smallStyle = new GUIStyle(GUI.skin.label) { font = chineseFont, normal = { textColor = new Color(0.74f, 0.80f, 0.92f) } };
+            buttonStyle = new GUIStyle(GUI.skin.button) { font = chineseFont, fontStyle = FontStyle.Bold };
         }
         titleStyle.fontSize = Mathf.RoundToInt(Mathf.Clamp(cell * 0.70f, 20f, 34f));
         labelStyle.fontSize = Mathf.RoundToInt(Mathf.Clamp(cell * 0.40f, 14f, 21f));
